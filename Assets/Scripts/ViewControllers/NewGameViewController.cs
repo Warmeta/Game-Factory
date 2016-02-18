@@ -20,7 +20,6 @@ public class NewGameViewController : GenericViewController {
 	public GameObject screensList;
 	public GameObject screenshotBox;
 	public List<GameObject> buttonList = new List<GameObject>();
-	private byte[] icon;
 	private Texture2D load_texture;
 	private string[] imagePaths = new string[5];
 	private int indexIs;
@@ -172,8 +171,10 @@ public class NewGameViewController : GenericViewController {
 
 	public void SaveImage(int n, KiiObject obj){
 		if (imagePaths[n] != null){
-			FileStream file = new FileStream(imagePaths[n], FileMode.Open); // Start uploading 
-			obj.UploadBody("image/icon", file, (KiiObject uploadedObj, Exception e2) => { if (e2 != null) { // Handle error 
+			//FileStream file = new FileStream(imagePaths[n], FileMode.Open); // Start uploading 
+			byte[] imageToBytes = LoadImage (imagePaths [n]).EncodeToPNG();
+			MemoryStream stream = new MemoryStream(imageToBytes);
+			obj.UploadBody("image/icon", stream, (KiiObject uploadedObj, Exception e2) => { if (e2 != null) { // Handle error 
 					return; 
 				} Debug.Log ("Uploaded image"+n);
 				}, (KiiObject uploadingObj, float progress) => { 
@@ -206,21 +207,21 @@ public class NewGameViewController : GenericViewController {
 		Texture2D tex = null;
 		tex = new Texture2D (2, 2);
 		tex.LoadImage (ReadImage(filePath)); //..this will auto-resize the texture dimensions.
+		TextureScale.Bilinear (tex, 200, 200);
 		return tex;
 	}
-
 	
 	// return image in bytes from directory.
 	private byte[] ReadImage (string filePath)
 	{
-			byte[] fileData;
-			fileData = File.ReadAllBytes (filePath);
-			if (fileData == null) {
-				Debug.Log ("#####Failed to read image from file.");
-			} else {
-				Debug.Log ("#####Load image " + fileData.Length + "bytes");
-			}
-			return fileData;
+		byte[] fileData;
+		fileData = File.ReadAllBytes (filePath);
+		if (fileData == null) {
+			Debug.Log ("#####Failed to read image from file.");
+		} else {
+			Debug.Log ("#####Load image " + fileData.Length + "bytes");
+		}
+		return fileData;
 	}
 
 	public int FindButtonIndex(GameObject go){
@@ -233,6 +234,8 @@ public class NewGameViewController : GenericViewController {
 		}
 		return foundButton;
 	}
+
+	public 
 
 	void GetButtonIndex(GameObject ob){
 		indexIs = FindButtonIndex(ob);
