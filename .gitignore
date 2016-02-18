@@ -1,0 +1,13 @@
+/Temp/
+/Library/
+/App
+/Apk
+/Xcode
+/obj
+*.csproj
+*.unityproj
+*.sln
+*.userprefs
+*.suo
+
+

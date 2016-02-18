@@ -1,0 +1,119 @@
+1
+Login
+Conectar
+Logout
+Desconectar
+Exit
+Salir
+Email
+Email
+Password
+Contraseña
+My Games
+Mis Juegos
+Continue
+Continuar
+Edit
+Editar
+New Game
+Nuevo Juego
+Save
+Guardar
+Cancel
+Cancelar
+Mission
+Mision
+Modify
+Modificar
+Delete
+Eliminar
+Accept
+Aceptar
+Title
+Titulo
+Background
+Fondo
+Audio
+Audio
+Chrono
+Crono
+Type of mission
+Tipo de misión
+Mission order
+Orden de misión
+Back
+Atras
+Game name
+Nombre de juego
+Change Language
+Cambiar Lenguaje
+Language
+Idioma
+Are you sure?
+¿Estas seguro?
+Game Name
+Nombre de Juego
+Editor
+Editor
+B
+B
++
++
+Sign Up
+Registrarse
+Unexpected exception occurred
+Error inesperado
+Registration failed
+Error de regristro
+Registration failed because the user already exists
+Error de registro, el usuario ya existe
+Network error occurred
+Error en la conexion
+Network timeout occurred
+Tiempo de espera agotado
+Email and password dont match
+Email y contraseña no coinciden
+(Email is not valid)
+(Email no valido)
+(Password is not valid)
+(Contraseña no valida)
+Title for your game...
+Título del juego...
+Keywords...
+Palabras Clave...
+Description...
+Descripcion...
+Categories...
+Categorias...
+  Platform
+  Plataforma
+  Language
+  Idioma
+Text for EULA
+Texto para EULA
+Icon
+Icono
+Add a new game
+Añadir nuevo juego
+Add
+Añadir
+Alert message example
+Ejemplo mensaje de alerta
+Main Screen
+Pantalla Principal
+Challenges
+Retos
+Edit Game
+Editar Juego
+Alert View
+Vistas de Alerta
+Register
+Registrar
+
+
+Example
+Ejemplo
+Uploading images please wait...
+Subiendo imagenes por favor espere...
+Error occurred during uploading...
+Ocurrio un error durante la subida...
