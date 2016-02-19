@@ -17,7 +17,7 @@ public class LoadTranslation_GUIButton : MonoBehaviour {
     }
      
     public void OnGUI(){
-        if(GUI.Button(new Rect(5,5,80,35),textBoton)){
+        if(GUI.Button(new Rect(5,Screen.height-40,80,35),textBoton)){
 			ApplicationController.GameLanguage = ApplicationController.GameLanguage==1?0:1;
 			if(ChangeLanguage!=null){ 
 				ChangeLanguage(ApplicationController.GameLanguage);

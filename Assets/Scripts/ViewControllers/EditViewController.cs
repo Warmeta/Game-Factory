@@ -97,7 +97,7 @@ public class EditViewController : GenericViewController {
 	}
 	
 	public void AddMission(){
-		navigationController.GoTo("EDITMISSION_VIEW");
+		navigationController.GoTo("MISSION_SELECT_VIEW");
 	}
 	
 	public void AlertMission(){
