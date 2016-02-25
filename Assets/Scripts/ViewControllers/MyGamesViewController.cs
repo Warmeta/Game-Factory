@@ -8,6 +8,7 @@ public class MyGamesViewController : GenericViewController {
 	
 	public GameObject gameBox;
 	public GameObject container;
+	public GameObject addGameButton;
 	public GameObject editViewController;
 	
 	void Awake () {
@@ -39,6 +40,12 @@ public class MyGamesViewController : GenericViewController {
 					gameBoxI.GetComponentInChildren<Button>().onClick.AddListener(() => navigationController.GoTo("EDIT_VIEW"));
 					//gameBox.GetComponentInChildren<RawImage>().texture = obj["icon"];
 				}
+				GameObject addGameBut;
+				addGameBut = Instantiate (addGameButton);
+				addGameBut.SetActive (true);
+				addGameBut.transform.SetParent (container.transform);
+				addGameBut.transform.localScale = new Vector3 (1, 1, 1);
+				addGameBut.GetComponentInChildren<Button>().onClick.AddListener(() => NewGame());
 			});
 		}
 	}
