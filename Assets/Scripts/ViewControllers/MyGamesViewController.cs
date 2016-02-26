@@ -20,25 +20,25 @@ public class MyGamesViewController : GenericViewController {
 	void OnEnable(){
 		if (applicationController.sessionStarted) {
 			KiiBucket appBucket = Kii.Bucket ("Games");
-			KiiClause clause = KiiClause.Equals ("userId", KiiUser.CurrentUser.ID);
-			KiiQuery query = new KiiQuery (clause);
+			KiiQuery query = new KiiQuery (KiiClause.Equals ("_owner", KiiUser.CurrentUser.ID));
 		
 			appBucket.Query (query, (KiiQueryResult<KiiObject> result, Exception e) => {
 				if (e != null) {
+					Debug.Log(e);
 					applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Unexpected exception occurred");
 					navigationController.GoTo ("ALERT_VIEW");
 					return;
 				}
 				foreach (KiiObject obj in result) {
-					GameObject gameBoxI;
-					gameBoxI = Instantiate (gameBox);
-					gameBoxI.SetActive (true);
-					gameBoxI.transform.SetParent (container.transform);
-					gameBoxI.transform.localScale = new Vector3 (1, 1, 1);
-					gameBoxI.GetComponentsInChildren<Text> () [0].text = obj.GetString ("gameName");
-					gameBoxI.GetComponentInChildren<Button>().onClick.AddListener(() => editViewController.GetComponent<EditViewController>().SetUri(obj.Uri));
-					gameBoxI.GetComponentInChildren<Button>().onClick.AddListener(() => navigationController.GoTo("EDIT_VIEW"));
-					//gameBox.GetComponentInChildren<RawImage>().texture = obj["icon"];
+						GameObject gameBoxI;
+						gameBoxI = Instantiate (gameBox);
+						gameBoxI.SetActive (true);
+						gameBoxI.transform.SetParent (container.transform);
+						gameBoxI.transform.localScale = new Vector3 (1, 1, 1);
+						gameBoxI.GetComponentsInChildren<Text> () [0].text = obj.GetString ("gameName");
+						gameBoxI.GetComponentInChildren<Button>().onClick.AddListener(() => editViewController.GetComponent<EditViewController>().SetUri(obj.Uri));
+						gameBoxI.GetComponentInChildren<Button>().onClick.AddListener(() => navigationController.GoTo("EDIT_VIEW"));
+						//gameBox.GetComponentInChildren<RawImage>().texture = obj["icon"];
 				}
 				GameObject addGameBut;
 				addGameBut = Instantiate (addGameButton);

@@ -23,6 +23,7 @@ public class NewGameViewController : GenericViewController {
 	private Texture2D load_texture;
 	private string[] imagePaths = new string[5];
 	private int indexIs;
+	private Uri objUri;
 
 	void Awake () {
 		Initialize();
@@ -31,6 +32,7 @@ public class NewGameViewController : GenericViewController {
 	}
 
 	void start(){
+
 	}
 
 	void OnEnable(){
@@ -41,10 +43,103 @@ public class NewGameViewController : GenericViewController {
 				instantiatedPrefab.SetActive (true);
 				instantiatedPrefab.transform.SetParent (screensList.transform);
 				instantiatedPrefab.transform.localScale = new Vector3 (1, 1, 1);
-				instantiatedPrefab.GetComponent<Button> ().onClick.AddListener (() => GetButtonIndex(instantiatedPrefab));
+				instantiatedPrefab.GetComponent<Button> ().onClick.AddListener (() => GetButtonIndex (instantiatedPrefab));
 				instantiatedPrefab.GetComponent<Button> ().onClick.AddListener (() => OpenScreenshot ());
-				buttonList.Add(instantiatedPrefab);
+				buttonList.Add (instantiatedPrefab);
 			}
+			bool validate = true;
+			KiiBucket appBucket = Kii.Bucket ("Games");
+			//string gameNameTrim = gameName.GetComponent<InputField> ().text.Replace (" ", String.Empty);
+			/*KiiQuery query = new KiiQuery(
+			KiiClause.And(
+			KiiClause.Equals("gameName", gameName.GetComponent<InputField>().text)
+			,KiiClause.Equals("bucketScreenshotsId", gameNameTrim)
+			)
+			);*/
+			//string bucketName = gameNameTrim+"-Screenshots-";
+			string userId = KiiUser.CurrentUser.ID;
+			KiiObject obj = Kii.Bucket ("Games").NewKiiObject ();
+			String id = "";
+			try {
+				obj.Refresh ();
+				id = obj.GetString ("_id");
+			} catch (Exception e) {
+				Debug.Log ("Fallo refresh id game: " + e);
+			}
+
+			/*obj["gameName"] = gameName.GetComponent<InputField>().text;
+		obj["gameDescription"] = gameDescription.GetComponent<InputField>().text;
+		obj["gameCategories"] = gameCategories.GetComponent<InputField>().text;
+		obj["gameKeywords"] = gameKeywords.GetComponent<InputField>().text;
+		obj["gameEula"] = gameEula.GetComponent<InputField>().text;
+		obj["gamePlatform"] = gamePlatform.GetComponent<Text> ().text;
+		obj["gameLanguage"] = gameLanguage.GetComponent<Text> ().text;
+		obj["userId"] = userId;
+		obj["bucketScreenshotsId"] = gameNameTrim;*/
+		
+			//obj["GameBucket"] = userId;
+		
+			//if(ValidatedFields()){
+			/*appBucket.Count(query, (KiiBucket b, KiiQuery q, int count, Exception e) => {
+			if (e != null){
+				validate = false;
+				applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Unexpected exception occurred");
+				navigationController.GoTo ("ALERT_VIEW");
+				return;
+			}
+			if (count > 0){
+				validate = false;
+				applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Game name already exist");
+				navigationController.GoTo ("ALERT_VIEW");
+				return;
+			}*/
+			if (validate) {
+				// Save the object
+				obj.SaveAllFields (true, (KiiObject savedObj, Exception exc) => {
+					if (exc is NetworkException) {
+						if (((NetworkException)exc).InnerException is TimeoutException) {
+							// Network timeout occurred
+							applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Network timeout occurred");
+							navigationController.GoTo ("ALERT_VIEW");
+							return;
+						} else {
+							// Network error occurred
+							applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Network error occurred");
+							navigationController.GoTo ("ALERT_VIEW");
+							return;
+						}
+					} else if (exc is ConflictException) {
+						// Registration failed because the user already exists
+						applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Registration failed because the game name already exists");
+						navigationController.GoTo ("ALERT_VIEW");
+						return;
+					} else if (exc is CloudException) {
+						// Registration failed
+						applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Registration failed");
+						navigationController.GoTo ("ALERT_VIEW");
+						return;
+					} else if (exc != null) {
+						// Unexpected exception occurred
+						applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Unexpected exception occurred");
+						navigationController.GoTo ("ALERT_VIEW");
+						return;
+					}
+					;
+					objUri = obj.Uri;
+					Debug.Log ("mi uri es:" + objUri);
+					/*Debug.Log ("SavingImages.");
+					SaveImage(0, obj);*/
+				});
+			}
+
+			//});
+			//Check whether the id is valid.
+			/*for (int i = 1; i < imagePaths.Length; i++){
+			SaveImages(bucketName, i);
+		}
+		Debug.Log ("ImagesSaved: GoTo Edit");*/
+			//navigationController.GoTo ("EDIT_VIEW");
+			//}
 		}
 	}
 
@@ -67,86 +162,96 @@ public class NewGameViewController : GenericViewController {
 		}
 	}
 
-	public void Save(){
+	public void Save(String field, String value){
 		bool validate = true;
-		KiiBucket appBucket = Kii.Bucket("Games");
-		string gameNameTrim = gameName.GetComponent<InputField> ().text.Replace (" ", String.Empty);
-		KiiQuery query = new KiiQuery(
-			KiiClause.And(
-			KiiClause.Equals("gameName", gameName.GetComponent<InputField>().text)
-			,KiiClause.Equals("bucketScreenshotsId", gameNameTrim)
-			)
-		);
-		string bucketName = gameNameTrim+"-Screenshots-";
-		string userId = KiiUser.CurrentUser.ID;
-		KiiObject obj = Kii.Bucket("Games").NewKiiObject();
+		KiiObject obj = KiiObject.CreateByUri(objUri);
+		//string gameNameTrim = gameName.GetComponent<InputField> ().text.Replace (" ", String.Empty);
+		//
 
-		obj["gameName"] = gameName.GetComponent<InputField>().text;
-		obj["gameDescription"] = gameDescription.GetComponent<InputField>().text;
+		//string bucketName = gameNameTrim+"-Game-";
+
+		obj.Refresh((KiiObject obj2, Exception ex) => {
+		if (ex != null)
+		{
+			// handle error
+			Debug.Log("Error en Refresh obj.");
+			return;
+		}
+
+		obj[field] = value;
+		/*obj["gameDescription"] = gameDescription.GetComponent<InputField>().text;
 		obj["gameCategories"] = gameCategories.GetComponent<InputField>().text;
 		obj["gameKeywords"] = gameKeywords.GetComponent<InputField>().text;
 		obj["gameEula"] = gameEula.GetComponent<InputField>().text;
 		obj["gamePlatform"] = gamePlatform.GetComponent<Text> ().text;
 		obj["gameLanguage"] = gameLanguage.GetComponent<Text> ().text;
-		obj["userId"] = userId;
-		obj["bucketScreenshotsId"] = gameNameTrim;
+		obj["bucketScreenshotsId"] = gameNameTrim;*/
 
-		if(ValidatedFields()){
-			appBucket.Count(query, (KiiBucket b, KiiQuery q, int count, Exception e) => {
-				if (e != null){
+		if (validate) {
+			// Save the object
+			obj2.Save((KiiObject updatedObj, Exception exc) => {
+				if (exc is NetworkException) {
+					if (((NetworkException)exc).InnerException is TimeoutException) {
+						// Network timeout occurred
+						applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Network timeout occurred");
+						navigationController.GoTo ("ALERT_VIEW");
+						return;
+					} else {
+						// Network error occurred
+						applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Network error occurred");
+						navigationController.GoTo ("ALERT_VIEW");
+						return;
+					}
+				} else if (exc is ConflictException) {
+					// Registration failed because the user already exists
+					applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Registration failed because the game name already exists");
+					navigationController.GoTo ("ALERT_VIEW");
+					return;
+				} else if (exc is CloudException) {
+					// Registration failed
+					applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Registration failed");
+					navigationController.GoTo ("ALERT_VIEW");
+					return;
+				} else if (exc != null) {
+					// Unexpected exception occurred
 					applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Unexpected exception occurred");
 					navigationController.GoTo ("ALERT_VIEW");
 					return;
-				}
-				if (count > 0){
-					validate = false;
-					applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Game name already exist");
-					navigationController.GoTo ("ALERT_VIEW");
-					return;
-				}
-				if (validate) {
-					// Save the object
-					obj.SaveAllFields (true, (KiiObject savedObj, Exception exc) => {
-						if (exc is NetworkException) {
-							if (((NetworkException)exc).InnerException is TimeoutException) {
-								// Network timeout occurred
-								applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Network timeout occurred");
-								navigationController.GoTo ("ALERT_VIEW");
-								return;
-							} else {
-								// Network error occurred
-								applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Network error occurred");
-								navigationController.GoTo ("ALERT_VIEW");
-								return;
-							}
-						} else if (exc is ConflictException) {
-							// Registration failed because the user already exists
-							applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Registration failed because the game name already exists");
-							navigationController.GoTo ("ALERT_VIEW");
-							return;
-						} else if (exc is CloudException) {
-							// Registration failed
-							applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Registration failed");
-							navigationController.GoTo ("ALERT_VIEW");
-							return;
-						} else if (exc != null) {
-							// Unexpected exception occurred
-							applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Unexpected exception occurred");
-							navigationController.GoTo ("ALERT_VIEW");
-							return;
-						};
-						Debug.Log ("SavingImages.");
-						SaveImage(0, obj);
-					});
-				}
+				};
 			});
-			// Check whether the id is valid.
-			for (int i = 1; i < imagePaths.Length; i++){
-				SaveImages(bucketName, i);
-			}
-			Debug.Log ("ImagesSaved: GoTo Edit");
-			//navigationController.GoTo ("EDIT_VIEW");
 		}
+		//Check whether the id is valid.
+		/*for (int i = 1; i < imagePaths.Length; i++){
+			SaveImages(bucketName, i);
+		}
+		Debug.Log ("ImagesSaved");*/
+		//navigationController.GoTo ("EDIT_VIEW");
+		});
+	}
+
+	public void SaveName(){
+		Save("gameName", gameName.GetComponent<InputField>().text);
+	}
+
+	public void SaveDescription(){
+		Save("gameName", gameName.GetComponent<InputField>().text);
+	}
+
+	public void SaveCategories(){
+		Save("gameDescription", gameDescription.GetComponent<InputField>().text);
+	}
+
+	public void SaveKeywords(){
+		Save("gameKeywords", gameKeywords.GetComponent<InputField>().text);
+	}
+
+	public void SaveEula(){
+		Save("gameEula", gameEula.GetComponent<InputField>().text);
+	}
+
+	public void SaveDropdowns(){
+		Save("gameLang", gameLanguage.GetComponent<Text> ().text);
+		Save("gamePlat", gamePlatform.GetComponent<Text> ().text);
 	}
 
 	public void OpenIcon () {
@@ -156,8 +261,11 @@ public class NewGameViewController : GenericViewController {
 				"",
 				"jpg");
 			if (filePath != "") {
+				KiiObject obj = KiiObject.CreateByUri(objUri);
 				gameIcon.GetComponentInChildren<RawImage> ().texture = LoadImage (filePath);
 				imagePaths [0] = filePath;
+				Debug.Log ("SavingImages.");
+				SaveImage(0, obj);
 			}
 		} catch(System.SystemException e) {
 			Debug.Log (e);
@@ -170,8 +278,10 @@ public class NewGameViewController : GenericViewController {
 			"Select your image:",
 			"",
 			"jpg");
-			screensList.GetComponentsInChildren<Button> ()[indexIs].GetComponentInChildren<RawImage> ().texture = LoadImage (filePath);
-			imagePaths [indexIs+1] = filePath;
+			if (filePath != "") {
+				screensList.GetComponentsInChildren<Button> ()[indexIs].GetComponentInChildren<RawImage> ().texture = LoadImage (filePath);
+				imagePaths [indexIs+1] = filePath;
+			}
 		} catch(System.SystemException e) {
 			Debug.Log (e);
 		}
@@ -194,12 +304,12 @@ public class NewGameViewController : GenericViewController {
 		}
 	}
 
-	public void SaveImages(string bucketName, int i){
+	public void SaveImages(string idGame, int i){
 		if (imagePaths[i] != null){
-			KiiObject obj = Kii.Bucket (bucketName).NewKiiObject ();
+			KiiObject obj = Kii.Bucket (idGame).NewKiiObject ();
 			// Set key-value pairs
 			obj ["screenshotName"] = "screenshot-0"+i;
-			obj ["bucketScreenshots"] = bucketName;
+			obj ["idGame"] = idGame;
 			obj.SaveAllFields (true, (KiiObject savedObj, Exception exc) => {
 				if (exc != null){
 					Debug.Log (exc);
@@ -304,7 +414,42 @@ public class NewGameViewController : GenericViewController {
 	
 	public void Cancel(){
 		Debug.Log ("Cancel");
-		navigationController.Back();
+		bool validate = true;
+		KiiObject obj = KiiObject.CreateByUri(objUri);
+	  	KiiBucket appBucket = Kii.Bucket("Games");
+	 	String id = "";
+	 	try {
+			obj.Refresh();
+			id = obj.GetString("_id");
+		} catch (Exception e) {
+			Debug.Log("Fallo refresh id game: "+e);
+		}
+		KiiQuery query = new KiiQuery(
+			KiiClause.And(
+				KiiClause.Equals("gameName", gameName.GetComponent<InputField>().text)
+				,KiiClause.NotEquals("_id", id)
+			)
+		);
+		appBucket.Count(query, (KiiBucket b, KiiQuery q, int count, Exception e) => {
+		if (e != null){
+			validate = false;
+			applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Unexpected exception occurred");
+			navigationController.GoTo ("ALERT_VIEW");
+			return;
+		}
+		if (count > 0){
+			validate = false;
+			applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Game name already exist");
+			navigationController.GoTo ("ALERT_VIEW");
+			return;
+		}
+			if (ValidatedFields() && validate) {
+				navigationController.Back ();
+			} else {
+				applicationController.alertView.GetComponent<AlertViewController> ().SetAlert ("Invalid inputs.");
+				navigationController.GoTo ("ALERT_VIEW");
+			}
+		});
 	}
 	
 	

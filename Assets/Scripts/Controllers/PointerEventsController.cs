@@ -8,21 +8,22 @@ public class PointerEventsController : MonoBehaviour,IPointerEnterHandler, IPoin
 	/*public int mouseOnCount = 0;
 	private AudioClip audioclip;
 	private AudioSource audiosource;*/
-	public GameObject miniButtons;
+	public GameObject hiddenObj;
 
 	public void Start(){
 		/*audioclip = Resources.Load <AudioClip> ("button_hover_sound");
-		gameObject.AddComponent<AudioSource> ();
+
 		audiosource = gameObject.GetComponent<AudioSource> ();*/
+		hiddenObj.SetActive(false);
 	}
 	
 	public void OnPointerEnter(PointerEventData eventData){
 		Debug.Log ("Enter");
-		miniButtons.SetActive (true);
+		hiddenObj.SetActive (true);
 	}
 	public void OnPointerExit(PointerEventData eventData){
 		Debug.Log ("Exit");
-		miniButtons.SetActive (false);
+		hiddenObj.SetActive (false);
 	}
 	
 }
